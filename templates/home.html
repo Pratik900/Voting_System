@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard - Option 3</title>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 20px;
+            width: 400px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<!-- Pass flag as data attribute -->
+<body data-show-register="{{ show_register_form }}">
+    <h1>This is Dashboard</h1>
+
+    <div id="registerModal" class="modal" style="display:none;">
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+
+    <script>
+        let modalShown = false;
+
+        function checkForHardware() {
+            if (modalShown) return;  // prevent re-fetching if modal already shown
+
+            fetch('/check-hardware')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.show === 1) {
+                        fetch('/register-form')
+                            .then(res => res.text())
+                            .then(html => {
+                                document.getElementById('modalContent').innerHTML = html;
+                                document.getElementById('registerModal').style.display = 'block';
+                                modalShown = true;  // prevent further fetches
+                            });
+                    }
+                });
+        }
+
+        setInterval(checkForHardware, 3000);
+
+
+        // ---- Added cancelRegistration function ----
+        function cancelRegistration() {
+            fetch('/cancel-registration', {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Hide the modal
+                    const modal = document.getElementById('registerModal');
+                    if (modal) modal.style.display = 'none';
+
+                    // Reset modalShown so modal can appear again later if needed
+                    modalShown = false;
+
+                    // Redirect to dashboard root
+                    window.location.href = '/';
+                } else {
+                    alert("Failed to cancel registration.");
+                }
+            })
+            .catch(err => {
+                console.error("Error cancelling:", err);
+            });
+        }
+    </script>
+</body>
+</html>

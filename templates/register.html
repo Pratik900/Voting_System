@@ -1,0 +1,44 @@
+<!-- templates/register.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Voting System</title>
+</head>
+<body>
+    <h2>Register Student</h2>
+    <form action="/submit-form" method="POST">
+        <label for="name">Name:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="prn">PRN Number:</label><br>
+        <input type="text" id="prn" name="prn" required><br><br>
+
+        <input type="submit" value="Submit">
+        <button type="button" onclick="cancelRegistration()">Cancel</button>
+    </form>
+
+    <script>
+        function cancelRegistration() {
+            fetch('/cancel-registration', {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Hide the modal
+                    const modal = document.getElementById('registerModal');
+                    if (modal) modal.style.display = 'none';
+
+                    // Optional: redirect or refresh
+                    window.location.href = '/';
+                } else {
+                    alert("Failed to cancel registration.");
+                }
+            })
+            .catch(err => {
+                console.error("Error cancelling:", err);
+            });
+        }
+    </script>
+</body>
+</html>
+
